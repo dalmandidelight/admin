@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1715,12 +1716,12 @@ function renderOrderLinks() {
     
     container.innerHTML = currentOrderLinks.map((link, idx) => `
         <div style="display:flex;gap:8px;align-items:center;">
-            <select style="flex:0 0 140px;" onchange="updateOrderLink(${idx}, 'platform', this.value)">
+            <select style="flex:0 0 140px;" oninput="updateOrderLink(${idx}, 'platform', this.value)">
                 <option value="">Platform...</option>
                 ${db.partners.map(p => `<option value="${p.Name}" ${link.platform === p.Name ? 'selected' : ''}>${p.Name}</option>`).join('')}
             </select>
             <input type="url" placeholder="https://..." style="flex:1;" value="${link.url || ''}" 
-                   onchange="updateOrderLink(${idx}, 'url', this.value)">
+                   oninput="updateOrderLink(${idx}, 'url', this.value)">
             <button type="button" class="btn btn-danger btn-sm" onclick="removeOrderLink(${idx})" style="flex:0 0 auto;">
                 <i class="fas fa-trash"></i>
             </button>
@@ -1745,8 +1746,12 @@ function removeOrderLink(idx) {
 function parseOrderPlatforms(platformString) {
     if (!platformString) return [];
     return platformString.split('|').map(item => {
-        const [platform, url] = item.split(':');
-        return { platform, url };
+        const colonIdx = item.indexOf(':');
+        if (colonIdx === -1) return { platform: item, url: '' };
+        return {
+            platform: item.substring(0, colonIdx),
+            url: item.substring(colonIdx + 1)
+        };
     });
 }
 
